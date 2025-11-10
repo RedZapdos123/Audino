@@ -104,11 +104,11 @@
 
 ## User Interface Screenshots:
 
-### Main Application Window
+### Main Application Window:
 ![Main Window](visuals/AudinoMainWindowWithPatientData.png)
 **Description**: Complete view of the application showing patient list, prescription form, medication selector, and real-time interaction alerts panel.
 
-### Patient Management Dialogs
+### Patient Management Dialogs:
 
 ![Add Patient](visuals/AudinoAddPatientDataWindow.png)
 **Description**: Dialog for adding new patients with fields for name, birth date, allergies, and medical conditions.
