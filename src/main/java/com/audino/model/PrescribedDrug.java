@@ -1,6 +1,5 @@
 package com.audino.model;
 
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 import java.util.Objects;
 
 public class PrescribedDrug {
@@ -12,7 +11,6 @@ public class PrescribedDrug {
     private String specialInstructions;
     private String prescribedBy;
 
-    @BsonIgnore
     private Medication medication;
 
     public PrescribedDrug() {
@@ -46,9 +44,7 @@ public class PrescribedDrug {
     public String getPrescribedBy() { return prescribedBy; }
     public void setPrescribedBy(String prescribedBy) { this.prescribedBy = prescribedBy; }
     
-    @BsonIgnore
     public Medication getMedication() { return medication; }
-    @BsonIgnore
     public void setMedication(Medication medication) { this.medication = medication; }
 
     @Override

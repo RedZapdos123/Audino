@@ -1,8 +1,5 @@
 package com.audino.model;
 
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.types.ObjectId;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +9,6 @@ import java.util.stream.Collectors;
 
 public class Prescription {
 
-    @BsonId
-    private ObjectId id;
     private String prescriptionId;
     private String patientId;
     private List<PrescribedDrug> prescribedDrugs;
@@ -51,8 +46,6 @@ public class Prescription {
         return prescribedDrugs.isEmpty();
     }
     
-    public ObjectId getId() { return id; }
-    public void setId(ObjectId id) { this.id = id; }
     public String getPrescriptionId() { return prescriptionId; }
     public void setPrescriptionId(String prescriptionId) { this.prescriptionId = prescriptionId; }
     public String getPatientId() { return patientId; }
@@ -73,11 +66,11 @@ public class Prescription {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Prescription that = (Prescription) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(prescriptionId, that.prescriptionId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(prescriptionId);
     }
 }

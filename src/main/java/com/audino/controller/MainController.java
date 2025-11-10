@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -78,6 +79,7 @@ public class MainController implements Initializable {
     private Prescription currentPrescription;
     private final ObservableList<Patient> patientList = FXCollections.observableArrayList();
     private final ObservableList<Medication> medicationList = FXCollections.observableArrayList();
+    private final ObservableList<Prescription> prescriptionList = FXCollections.observableArrayList();
     private final ObservableList<InteractionAlert> alertList = FXCollections.observableArrayList();
     private final ObservableList<PrescribedDrug> prescribedDrugList = FXCollections.observableArrayList();
 
@@ -107,6 +109,7 @@ public class MainController implements Initializable {
             dataService.loadAllData();
             patientList.setAll(dataService.getAllPatients());
             medicationList.setAll(dataService.getAllMedications());
+            prescriptionList.setAll(dataService.getAllPrescriptions());
             statusLabel.setText("Data loaded successfully.");
         } catch (Exception e) {
             statusLabel.setText("Error loading data.");
@@ -254,7 +257,8 @@ public class MainController implements Initializable {
                     setGraphic(null);
                 } else {
                     setGraphic(removeBtn);
-                    removeBtn.setDisable(currentPrescription != null && currentPrescription.getStatus() != PrescriptionStatus.DRAFT);
+                    // Always enable remove button
+                    removeBtn.setDisable(false);
                 }
             }
         });
@@ -408,15 +412,13 @@ public class MainController implements Initializable {
     }
 
     private void handleRemoveMedication(PrescribedDrug drug) {
-        if (currentPrescription != null && currentPrescription.getStatus() == PrescriptionStatus.DRAFT) {
+        if (currentPrescription != null) {
             currentPrescription.removePrescribedDrug(drug);
             prescribedDrugList.setAll(currentPrescription.getPrescribedDrugs());
             checkInteractions();
             updateUIState();
-            statusLabel.setText(drug.getMedication().getDisplayName() + " removed from draft. Click 'Save' to approve.");
-            prescriptionStatusLabel.setText("Prescription Status: DRAFT (modified)");
-        } else {
-             showWarningAlert("Prescription Not Editable", "This prescription is not a draft and cannot be modified.");
+            statusLabel.setText(drug.getMedication().getDisplayName() + " removed from prescription.");
+            prescriptionStatusLabel.setText("Prescription Status: " + currentPrescription.getStatus());
         }
     }
 
@@ -444,6 +446,7 @@ public class MainController implements Initializable {
             currentPrescription.setStatus(PrescriptionStatus.APPROVED);
             currentPrescription.setAlerts(alertList);
             dataService.savePrescription(currentPrescription);
+            prescriptionList.add(currentPrescription);
             statusLabel.setText("Prescription saved and approved.");
             showInfoAlert("Success", "Prescription has been saved to the database.");
             updateUIState();
@@ -564,6 +567,11 @@ public class MainController implements Initializable {
     }
 
     public void shutdown() {
+        // Save all data before shutting down
+        if (dataService != null) {
+            dataService.saveAllData(new ArrayList<>(patientList), new ArrayList<>(prescriptionList));
+        }
+        
         if (interactionEngine != null) {
             interactionEngine.shutdown();
         }

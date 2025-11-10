@@ -1,7 +1,6 @@
 package com.audino;
 
 import com.audino.controller.MainController;
-import com.audino.service.MongoService;
 import com.audino.util.ConfigurationManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +18,6 @@ public class AudinoApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         ConfigurationManager.getInstance().initialize();
-        MongoService.getInstance().initialize();
         loadFonts();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
@@ -53,7 +51,6 @@ public class AudinoApplication extends Application {
         if (mainController != null) {
             mainController.shutdown();
         }
-        MongoService.getInstance().close();
         System.out.println("Audino application has been stopped.");
     }
 

@@ -1,5 +1,6 @@
 package com.audino.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
@@ -57,10 +58,15 @@ public class ConfigurationManager {
     private void initializeObjectMapper() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public String getProperty(String key, String defaultValue) {
         return applicationProperties.getProperty(key, defaultValue);
+    }
+    
+    public String getPatientsDataFile() {
+        return getProperty("data.patients.file", "/data/patients.json");
     }
     
     public String getMedicationsDataFile() {
@@ -69,6 +75,10 @@ public class ConfigurationManager {
 
     public String getInteractionRulesDataFile() {
         return getProperty("data.interactions.file", "/data/interaction-rules.json");
+    }
+    
+    public String getPrescriptionsDataFile() {
+        return getProperty("data.prescriptions.file", "/data/prescriptions.json");
     }
 
     public ObjectMapper getObjectMapper() {

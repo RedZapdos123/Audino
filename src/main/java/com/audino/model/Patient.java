@@ -1,8 +1,6 @@
 package com.audino.model;
 
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.types.ObjectId;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -11,8 +9,6 @@ import java.util.Objects;
 
 public class Patient {
 
-    @BsonId
-    private ObjectId id;
     private String patientId;
     private String firstName;
     private String lastName;
@@ -34,14 +30,13 @@ public class Patient {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public ObjectId getId() { return id; }
-    public void setId(ObjectId id) { this.id = id; }
     public String getPatientId() { return patientId; }
     public void setPatientId(String patientId) { this.patientId = patientId; }
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
+    @JsonIgnore
     public String getFullName() {
         return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
     }
@@ -51,6 +46,7 @@ public class Patient {
     public void setGender(String gender) { this.gender = gender; }
     public String getContactNumber() { return contactNumber; }
     public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+    @JsonIgnore
     public int getAge() {
         if (dateOfBirth == null) {
             return 0;
@@ -77,17 +73,17 @@ public class Patient {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Patient patient = (Patient) o;
-        return Objects.equals(id, patient.id);
+        return Objects.equals(patientId, patient.patientId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(patientId);
     }
 
     @Override
     public String toString() {
         return String.format("Patient{id='%s', name='%s', age=%d}",
-                           id, getFullName(), getAge());
+                           patientId, getFullName(), getAge());
     }
 }

@@ -19,7 +19,6 @@
         <javafx.version>19.0.2.1</javafx.version>
         <jackson.version>2.15.2</jackson.version>
         <junit.version>5.10.0</junit.version>
-        <mongodb.driver.version>4.10.2</mongodb.driver.version>
     </properties>
 
     <dependencies>
@@ -50,13 +49,6 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- MongoDB Driver -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>${mongodb.driver.version}</version>
         </dependency>
 
         <!-- Logging Dependency -->

@@ -6,7 +6,9 @@ import com.audino.model.Prescription;
 import com.audino.util.ConfigurationManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,19 +20,18 @@ public class DataService {
     private final ConfigurationManager config;
     private List<Patient> patients = new ArrayList<>();
     private List<Medication> medications = new ArrayList<>();
+    private List<Prescription> prescriptions = new ArrayList<>();
     private Map<String, Object> interactionRules;
-    private final MongoService mongoService;
-
     public DataService() {
         this.config = ConfigurationManager.getInstance();
         this.objectMapper = config.getObjectMapper();
-        this.mongoService = MongoService.getInstance();
     }
 
     public void loadAllData() {
-        patients = mongoService.getAllPatients();
+        patients = loadData(config.getPatientsDataFile(), new TypeReference<>() {});
         medications = loadData(config.getMedicationsDataFile(), new TypeReference<>() {});
         interactionRules = loadData(config.getInteractionRulesDataFile(), new TypeReference<>() {});
+        prescriptions = loadData(config.getPrescriptionsDataFile(), new TypeReference<>() {});
         System.out.println("All data loaded.");
     }
 
@@ -52,6 +53,10 @@ public class DataService {
 
     public List<Medication> getAllMedications() {
         return new ArrayList<>(medications);
+    }
+    
+    public List<Prescription> getAllPrescriptions() {
+        return new ArrayList<>(prescriptions);
     }
 
     public Map<String, Object> getInteractionRules() {
@@ -80,25 +85,66 @@ public class DataService {
     }
 
     public void savePatient(Patient patient) {
-        mongoService.addPatient(patient);
         patients.add(patient);
     }
 
     public void updatePatient(Patient patient) {
-        mongoService.updatePatient(patient);
+        // Patient is already in the list by reference
     }
 
     public void deletePatient(Patient patient) {
-        mongoService.deletePrescriptionsForPatient(patient.getPatientId());
-        mongoService.deletePatient(patient);
         patients.remove(patient);
     }
 
     public void savePrescription(Prescription prescription) {
-        mongoService.addPrescription(prescription);
+        prescriptions.add(prescription);
     }
 
     public List<Prescription> getPrescriptionsForPatient(Patient patient) {
-        return mongoService.getPrescriptionsForPatient(patient.getPatientId());
+        return prescriptions.stream()
+                .filter(p -> p.getPatientId().equals(patient.getPatientId()))
+                .collect(Collectors.toList());
+    }
+    
+    public void saveAllData() {
+        try {
+            saveDataToFile(patients, config.getPatientsDataFile());
+            saveDataToFile(prescriptions, config.getPrescriptionsDataFile());
+            System.out.println("All data saved successfully.");
+        } catch (Exception e) {
+            System.err.println("Error saving data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public void saveAllData(List<Patient> currentPatients, List<Prescription> currentPrescriptions) {
+        try {
+            saveDataToFile(currentPatients, config.getPatientsDataFile());
+            saveDataToFile(currentPrescriptions, config.getPrescriptionsDataFile());
+            System.out.println("All data saved successfully.");
+        } catch (Exception e) {
+            System.err.println("Error saving data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private <T> void saveDataToFile(T data, String resourcePath) throws Exception {
+        String projectRoot = System.getProperty("user.dir");
+        
+        // Save to source directory (src/main/resources)
+        String sourceFilePath = Paths.get(projectRoot, "src", "main", "resources", resourcePath).toString();
+        File sourceFile = new File(sourceFilePath);
+        sourceFile.getParentFile().mkdirs();
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(sourceFile, data);
+        System.out.println("Saved data to source: " + sourceFilePath);
+        
+        // Also save to target directory (target/classes) for immediate effect
+        String targetFilePath = Paths.get(projectRoot, "target", "classes", resourcePath).toString();
+        File targetFile = new File(targetFilePath);
+        if (targetFile.getParentFile().exists()) {
+            targetFile.getParentFile().mkdirs();
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(targetFile, data);
+            System.out.println("Saved data to target: " + targetFilePath);
+        }
     }
 }
