@@ -1,83 +1,4 @@
 [ {
-  "prescriptionId" : "RX-001-RAJ",
-  "patientId" : "PAT-A1B2C3D4",
-  "prescribedDrugs" : [ {
-    "medicationId" : "MED-001",
-    "dosage" : "10mg",
-    "frequency" : "Once daily",
-    "duration" : "Ongoing",
-    "specialInstructions" : "Take in the morning for blood pressure control",
-    "prescribedBy" : null,
-    "medication" : {
-      "medicationType" : "TABLET",
-      "displayName" : "Zestril",
-      "medicationId" : "MED-001",
-      "genericName" : "Lisinopril",
-      "brandName" : "Zestril",
-      "activeIngredients" : [ "Lisinopril" ],
-      "interactionIdentifiers" : [ "ACE_INHIBITOR" ],
-      "medicationType" : "TABLET",
-      "strength" : "10mg"
-    },
-    "valid" : false
-  }, {
-    "medicationId" : "MED-010",
-    "dosage" : "40mg",
-    "frequency" : "Once daily",
-    "duration" : "Ongoing",
-    "specialInstructions" : "For fluid management in CKD",
-    "prescribedBy" : null,
-    "medication" : {
-      "medicationType" : "TABLET",
-      "displayName" : "Lasix",
-      "medicationId" : "MED-010",
-      "genericName" : "Furosemide",
-      "brandName" : "Lasix",
-      "activeIngredients" : [ "Furosemide" ],
-      "interactionIdentifiers" : [ "DIURETIC_LOOP" ],
-      "medicationType" : "TABLET",
-      "strength" : "40mg"
-    },
-    "valid" : false
-  }, {
-    "medicationId" : "MED-005",
-    "dosage" : "250mg",
-    "frequency" : "Twice daily",
-    "duration" : "7 days",
-    "specialInstructions" : "For respiratory infection - safe alternative to Penicillin",
-    "prescribedBy" : null,
-    "medication" : {
-      "medicationType" : "TABLET",
-      "displayName" : "Zithromax",
-      "medicationId" : "MED-005",
-      "genericName" : "Azithromycin",
-      "brandName" : "Zithromax",
-      "activeIngredients" : [ "Azithromycin" ],
-      "interactionIdentifiers" : [ "ANTIBIOTIC_MACROLIDE", "CYP3A4_INHIBITOR", "QT_PROLONGING" ],
-      "medicationType" : "TABLET",
-      "strength" : "250mg"
-    },
-    "valid" : false
-  } ],
-  "createdAt" : null,
-  "prescribedBy" : null,
-  "status" : "APPROVED",
-  "alerts" : [ {
-    "alertId" : null,
-    "alertLevel" : "INFO",
-    "alertType" : "DRUG_ALLERGY",
-    "title" : "Allergy Alert - Safe Alternative Used",
-    "message" : "Patient has documented Penicillin allergy. Azithromycin prescribed as safe alternative antibiotic.",
-    "recommendation" : "Continue with macrolide antibiotic. Monitor for allergic reactions.",
-    "involvedMedications" : "Azithromycin",
-    "patientFactor" : "Penicillin",
-    "createdAt" : null,
-    "acknowledged" : false,
-    "formattedMessage" : "Alert Type: Drug-Allergy Interaction\nLevel: Information\n\nDetails:\nPatient has documented Penicillin allergy. Azithromycin prescribed as safe alternative antibiotic.\n\nRecommendation:\nContinue with macrolide antibiotic. Monitor for allergic reactions.",
-    "cssClass" : "alert-info"
-  } ],
-  "empty" : false
-}, {
   "prescriptionId" : "RX-002-PRI",
   "patientId" : "PAT-E5F6G7H8",
   "prescribedDrugs" : [ {
@@ -617,5 +538,33 @@
     "formattedMessage" : "Alert Type: Drug-Allergy Interaction\nLevel: Information\n\nDetails:\nPatient has documented Penicillin allergy. Doxycycline prescribed as safe alternative for acne treatment.\n\nRecommendation:\nAvoid all Penicillin and Cephalosporin antibiotics. Monitor for photosensitivity with Doxycycline - use sunscreen.",
     "cssClass" : "alert-info"
   } ],
+  "empty" : false
+}, {
+  "prescriptionId" : "RX-C7349FD5",
+  "patientId" : "PAT-A1B2C3D4",
+  "prescribedDrugs" : [ {
+    "medicationId" : "MED-002",
+    "dosage" : "1",
+    "frequency" : "Twice Daily",
+    "duration" : "5",
+    "specialInstructions" : "",
+    "prescribedBy" : "Dr. User",
+    "medication" : {
+      "medicationType" : "TABLET",
+      "displayName" : "Lipitor",
+      "medicationId" : "MED-002",
+      "genericName" : "Atorvastatin",
+      "brandName" : "Lipitor",
+      "activeIngredients" : [ "Atorvastatin" ],
+      "interactionIdentifiers" : [ "STATIN", "CYP3A4_SUBSTRATE" ],
+      "medicationType" : "TABLET",
+      "strength" : "20mg"
+    },
+    "valid" : true
+  } ],
+  "createdAt" : [ 2025, 11, 12, 23, 25, 33, 377005980 ],
+  "prescribedBy" : "Dr. User",
+  "status" : "APPROVED",
+  "alerts" : [ ],
   "empty" : false
 } ]
