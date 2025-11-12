@@ -43,19 +43,45 @@ public class DrugDrugCheckStrategy implements InteractionCheckStrategy {
 
                 drugDrugRules.forEach((key, ruleObj) -> {
                     Map<String, Object> rule = (Map<String, Object>) ruleObj;
-                    String drug1Class = (String) rule.get("drug1");
-                    String drug2Class = (String) rule.get("drug2");
+                    Object drug1Obj = rule.get("drug1");
+                    Object drug2Obj = rule.get("drug2");
                     
-                    if (drug1Class != null && drug2Class != null) {
-                        boolean pair1Match = ids1.stream().anyMatch(id -> id.equalsIgnoreCase(drug1Class)) &&
-                                             ids2.stream().anyMatch(id -> id.equalsIgnoreCase(drug2Class));
-                        
-                        boolean pair2Match = ids1.stream().anyMatch(id -> id.equalsIgnoreCase(drug2Class)) &&
-                                             ids2.stream().anyMatch(id -> id.equalsIgnoreCase(drug1Class));
-                        
-                        if (pair1Match || pair2Match) {
-                            alerts.add(createAlert(med1, med2, rule));
+                    // Handle both String and List<String> for drug classes
+                    List<String> drug1Classes = new ArrayList<>();
+                    List<String> drug2Classes = new ArrayList<>();
+                    
+                    if (drug1Obj instanceof String) {
+                        drug1Classes.add((String) drug1Obj);
+                    } else if (drug1Obj instanceof List) {
+                        drug1Classes.addAll((List<String>) drug1Obj);
+                    }
+                    
+                    if (drug2Obj instanceof String) {
+                        drug2Classes.add((String) drug2Obj);
+                    } else if (drug2Obj instanceof List) {
+                        drug2Classes.addAll((List<String>) drug2Obj);
+                    }
+                    
+                    // Check if any combination of drug1 and drug2 classes match
+                    boolean matchFound = false;
+                    for (String drug1Class : drug1Classes) {
+                        for (String drug2Class : drug2Classes) {
+                            boolean pair1Match = ids1.stream().anyMatch(id -> id.equalsIgnoreCase(drug1Class)) &&
+                                                 ids2.stream().anyMatch(id -> id.equalsIgnoreCase(drug2Class));
+                            
+                            boolean pair2Match = ids1.stream().anyMatch(id -> id.equalsIgnoreCase(drug2Class)) &&
+                                                 ids2.stream().anyMatch(id -> id.equalsIgnoreCase(drug1Class));
+                            
+                            if (pair1Match || pair2Match) {
+                                matchFound = true;
+                                break;
+                            }
                         }
+                        if (matchFound) break;
+                    }
+                    
+                    if (matchFound) {
+                        alerts.add(createAlert(med1, med2, rule));
                     }
                 });
             }
