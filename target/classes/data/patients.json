@@ -70,4 +70,13 @@
   "contactNumber" : null,
   "allergies" : [ "Penicillin", "Peanuts" ],
   "chronicConditions" : [ "Iron Deficiency Anemia", "PCOS" ]
+}, {
+  "patientId" : "PAT-DCF2AD21",
+  "firstName" : "Arjun",
+  "lastName" : "Deshwal",
+  "dateOfBirth" : [ 2006, 3, 29 ],
+  "gender" : "Male",
+  "contactNumber" : null,
+  "allergies" : [ "Peanuts" ],
+  "chronicConditions" : [ "Asthma" ]
 } ]

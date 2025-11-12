@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -341,13 +342,50 @@ public class MainController implements Initializable {
             showWarningAlert("No Patient Selected", "Please select a patient before starting a new prescription.");
             return;
         }
+        
+        // Check if patient already has an existing prescription
+        Prescription existingPrescription = dataService.getActivePrescriberionForPatient(selectedPatient.getPatientId());
+        if (existingPrescription != null) {
+            // Show confirmation dialog about replacing existing prescription
+            boolean proceed = showConfirmationAlert("Replace Existing Prescription", 
+                "Patient " + selectedPatient.getFullName() + " already has an active prescription. " +
+                "Creating a new prescription will replace the existing one. Do you want to continue?");
+            if (!proceed) {
+                return;
+            }
+        }
+        
         currentPrescription = new Prescription(selectedPatient, "Dr. User");
         clearPrescriptionForm();
         prescribedDrugList.clear();
         alertList.clear();
         updateAlertsSummary();
         updateUIState();
-        statusLabel.setText("New prescription started for " + selectedPatient.getFullName());
+        statusLabel.setText("New prescription started for " + selectedPatient.getFullName() + 
+                          (existingPrescription != null ? " (will replace existing prescription)" : ""));
+    }
+
+    @FXML
+    private void handleLoadExistingPrescription() {
+        if (selectedPatient == null) {
+            showWarningAlert("No Patient Selected", "Please select a patient to load prescription for.");
+            return;
+        }
+        
+        Prescription existingPrescription = dataService.getActivePrescriberionForPatient(selectedPatient.getPatientId());
+        if (existingPrescription == null) {
+            showWarningAlert("No Existing Prescription", "Patient " + selectedPatient.getFullName() + " has no active prescription to load.");
+            return;
+        }
+        
+        currentPrescription = existingPrescription;
+        prescribedDrugList.setAll(currentPrescription.getPrescribedDrugs());
+        clearPrescriptionForm();
+        alertList.clear();
+        updateAlertsSummary();
+        updateUIState();
+        statusLabel.setText("Loaded existing prescription for " + selectedPatient.getFullName());
+        prescriptionStatusLabel.setText("Prescription Status: " + currentPrescription.getStatus());
     }
 
     @FXML
@@ -375,18 +413,46 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleAddMedication() {
-        if (currentPrescription == null) {
-            showWarningAlert("No Active Prescription", "Please start a new prescription before adding medications.");
+        if (selectedPatient == null) {
+            showWarningAlert("No Patient Selected", "Please select a patient before adding medications.");
             return;
         }
 
+        // If no current prescription, check if patient has existing prescription
+        if (currentPrescription == null) {
+            Prescription existingPrescription = dataService.getActivePrescriberionForPatient(selectedPatient.getPatientId());
+            if (existingPrescription != null) {
+                // Ask user if they want to load existing prescription or create new one
+                boolean loadExisting = showConfirmationAlert("Load Existing Prescription?", 
+                    "Patient " + selectedPatient.getFullName() + " has an existing prescription. " +
+                    "Do you want to add to the existing prescription? (No = create new prescription)");
+                if (loadExisting) {
+                    currentPrescription = existingPrescription;
+                    prescribedDrugList.setAll(currentPrescription.getPrescribedDrugs());
+                    statusLabel.setText("Loaded existing prescription for " + selectedPatient.getFullName());
+                    prescriptionStatusLabel.setText("Prescription Status: " + currentPrescription.getStatus());
+                    updateUIState();
+                } else {
+                    // User wants to create new prescription - redirect to handleNewPrescription
+                    handleNewPrescription();
+                    if (currentPrescription == null) return; // User cancelled new prescription
+                }
+            } else {
+                showWarningAlert("No Active Prescription", 
+                    "Please start a new prescription before adding medications.");
+                return;
+            }
+        }
+
+        // If prescription is approved, create a new draft that preserves ALL current medications
         if (currentPrescription.getStatus() == PrescriptionStatus.APPROVED) {
             Prescription newDraft = new Prescription(selectedPatient, "Dr. User");
+            // Copy all existing drugs from the current prescription 
             for (PrescribedDrug drug : currentPrescription.getPrescribedDrugs()) {
                 newDraft.addPrescribedDrug(drug);
             }
             currentPrescription = newDraft;
-            statusLabel.setText("New draft created. Click 'Save' to approve changes.");
+            statusLabel.setText("New draft created from existing prescription. Click 'Save' to approve changes.");
             prescriptionStatusLabel.setText("Prescription Status: DRAFT (modified)");
         }
 
@@ -411,7 +477,7 @@ public class MainController implements Initializable {
         clearPrescriptionForm();
         checkInteractions();
         updateUIState();
-        statusLabel.setText(newDrug.getMedication().getDisplayName() + " added to draft. Click 'Save' to approve.");
+        statusLabel.setText(newDrug.getMedication().getDisplayName() + " added to prescription. Click 'Save' to approve.");
         prescriptionStatusLabel.setText("Prescription Status: DRAFT (modified)");
     }
 
@@ -606,5 +672,15 @@ public class MainController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private boolean showConfirmationAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 }
