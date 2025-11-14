@@ -42,9 +42,12 @@ public class AllergyCheckStrategy implements InteractionCheckStrategy {
                 allergyRules.forEach((key, ruleObj) -> {
                     Map<String, Object> rule = (Map<String, Object>) ruleObj;
                     List<String> keywords = (List<String>) rule.get("allergyKeywords");
+                    List<String> medicationClasses = (List<String>) rule.get("medicationClasses");
 
-                    if (keywords.stream().anyMatch(allergyLower::contains)) {
-                        if (medIdentifiers.stream().anyMatch(keywords::contains)) {
+                    // Check if patient allergy matches the rule's allergy keywords
+                    if (keywords != null && keywords.stream().anyMatch(keyword -> allergyLower.contains(keyword.toLowerCase()))) {
+                        // Check if prescribed medication's class matches the rule's medication classes
+                        if (medicationClasses != null && medIdentifiers.stream().anyMatch(medId -> medicationClasses.contains(medId.toUpperCase()))) {
                             alerts.add(createAlert(patient, med, allergy, rule));
                         }
                     }

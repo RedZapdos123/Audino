@@ -35,9 +35,10 @@ public class DataServiceTest {
     @Test
     @DisplayName("Should search for patients correctly")
     void testSearchPatients() {
-        List<Patient> results = dataService.searchPatients("Smith");
+        List<Patient> results = dataService.searchPatients("Mandal");
         assertEquals(1, results.size());
-        assertEquals("Smith", results.get(0).getLastName());
+        assertEquals("Mandal", results.get(0).getLastName());
+        assertEquals("Mridankan", results.get(0).getFirstName());
     }
     
     @Test

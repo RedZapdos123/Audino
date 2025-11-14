@@ -86,24 +86,59 @@ public class DataService {
 
     public void savePatient(Patient patient) {
         patients.add(patient);
+        // Persist changes immediately to files
+        saveAllData();
     }
 
     public void updatePatient(Patient patient) {
         // Patient is already in the list by reference
+        // Persist changes immediately to files
+        saveAllData();
     }
 
     public void deletePatient(Patient patient) {
         patients.remove(patient);
+        // Persist changes immediately to files
+        saveAllData();
     }
 
     public void savePrescription(Prescription prescription) {
+        // Remove any existing prescriptions for this patient to ensure only one active prescription
+        prescriptions.removeIf(p -> p.getPatientId().equals(prescription.getPatientId()));
         prescriptions.add(prescription);
+        // Persist changes immediately to files
+        saveAllData();
+    }
+
+    public boolean addMedicationToExistingPrescription(String patientId, Medication medication, String dosage, String frequency, String duration, String prescribingPhysician) {
+        // Find existing prescription for the patient
+        Prescription existingPrescription = prescriptions.stream()
+                .filter(p -> p.getPatientId().equals(patientId))
+                .findFirst()
+                .orElse(null);
+        
+        if (existingPrescription != null) {
+            // Add medication to existing prescription
+            existingPrescription.addPrescribedDrug(new com.audino.model.PrescribedDrug(
+                medication, dosage, frequency, duration, "", prescribingPhysician));
+            // Persist changes immediately to files
+            saveAllData();
+            return true;
+        }
+        return false; // No existing prescription found
     }
 
     public List<Prescription> getPrescriptionsForPatient(Patient patient) {
         return prescriptions.stream()
                 .filter(p -> p.getPatientId().equals(patient.getPatientId()))
                 .collect(Collectors.toList());
+    }
+    
+    public Prescription getActivePrescriberionForPatient(String patientId) {
+        return prescriptions.stream()
+                .filter(p -> p.getPatientId().equals(patientId))
+                .findFirst()
+                .orElse(null);
     }
     
     public void saveAllData() {

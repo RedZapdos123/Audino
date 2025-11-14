@@ -19,13 +19,13 @@ public class PatientTest { // This line was changed
     }
 
     @Test
-    @DisplayName("Should create patient and generate ID")
+    @DisplayName("Should create patient with basic information")
     void testPatientCreation() {
         assertEquals("John", patient.getFirstName());
         assertEquals("Doe", patient.getLastName());
         assertEquals("John Doe", patient.getFullName());
-        assertNotNull(patient.getPatientId());
-        assertTrue(patient.getPatientId().startsWith("PAT-"));
+        // Patient ID is set by DataService, not in constructor
+        assertNull(patient.getPatientId());
     }
 
     @Test
